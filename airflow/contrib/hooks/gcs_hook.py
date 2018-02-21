@@ -15,6 +15,7 @@
 from apiclient.discovery import build
 from apiclient.http import MediaFileUpload
 from googleapiclient import errors
+from airflow.exceptions import AirflowException
 
 from airflow.contrib.hooks.gcp_api_base_hook import GoogleCloudBaseHook
 
@@ -297,3 +298,23 @@ class GoogleCloudStorageHook(GoogleCloudBaseHook):
         except errors.HttpError as ex:
             if ex.resp['status'] == '404':
                 raise ValueError('Object Not Found')
+
+def _parse_gcs_url(gsurl):
+    """
+    Given a Google Cloud Storage URL (gs://<bucket>/<blob>), returns a
+    tuple containing the corresponding bucket and blob.
+    """
+    # Python 3
+    try:
+        from urllib.parse import urlparse
+    # Python 2
+    except ImportError:
+        from urlparse import urlparse
+
+    parsed_url = urlparse(gsurl)
+    if not parsed_url.netloc:
+        raise AirflowException('Please provide a bucket name')
+    else:
+        bucket = parsed_url.netloc
+        blob = parsed_url.path.strip('/')
+        return bucket, blob
