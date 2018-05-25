@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
 import json
 
@@ -19,7 +24,7 @@ from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.utils.file import TemporaryDirectory
-from docker import Client, tls
+from docker import APIClient, tls
 import ast
 
 
@@ -40,7 +45,7 @@ class DockerOperator(BaseOperator):
     :param api_version: Remote API version. Set to ``auto`` to automatically
         detect the server's version.
     :type api_version: str
-    :param command: Command to be run in the container.
+    :param command: Command to be run in the container. (templated)
     :type command: str or list
     :param cpus: Number of CPUs to assign to the container.
         This value gets multiplied with 1024. See
@@ -49,7 +54,7 @@ class DockerOperator(BaseOperator):
     :param docker_url: URL of the host running the docker daemon.
         Default is unix://var/run/docker.sock
     :type docker_url: str
-    :param environment: Environment variables to set in the container.
+    :param environment: Environment variables to set in the container. (templated)
     :type environment: dict
     :param force_pull: Pull the docker image on every run. Default is false.
     :type force_pull: bool
@@ -88,7 +93,7 @@ class DockerOperator(BaseOperator):
     :param docker_conn_id: ID of the Airflow connection to use
     :type docker_conn_id: str
     """
-    template_fields = ('command',)
+    template_fields = ('command', 'environment',)
     template_ext = ('.sh', '.bash',)
 
     @apply_defaults
@@ -140,6 +145,7 @@ class DockerOperator(BaseOperator):
         self.xcom_push_flag = xcom_push
         self.xcom_all = xcom_all
         self.docker_conn_id = docker_conn_id
+        self.shm_size = kwargs.get('shm_size')
 
         self.cli = None
         self.container = None
@@ -147,7 +153,7 @@ class DockerOperator(BaseOperator):
     def get_hook(self):
         return DockerHook(
             docker_conn_id=self.docker_conn_id,
-            base_url=self.base_url,
+            base_url=self.docker_url,
             version=self.api_version,
             tls=self.__get_tls_config()
         )
@@ -160,7 +166,7 @@ class DockerOperator(BaseOperator):
         if self.docker_conn_id:
             self.cli = self.get_hook().get_conn()
         else:
-            self.cli = Client(
+            self.cli = APIClient(
                 base_url=self.docker_url,
                 version=self.api_version,
                 tls=tls_config
@@ -184,15 +190,17 @@ class DockerOperator(BaseOperator):
             self.volumes.append('{0}:{1}'.format(host_tmp_dir, self.tmp_dir))
 
             self.container = self.cli.create_container(
-                    command=self.get_command(),
-                    cpu_shares=cpu_shares,
-                    environment=self.environment,
-                    host_config=self.cli.create_host_config(binds=self.volumes,
-                                                            network_mode=self.network_mode),
-                    image=image,
-                    mem_limit=self.mem_limit,
-                    user=self.user,
-                    working_dir=self.working_dir
+                command=self.get_command(),
+                cpu_shares=cpu_shares,
+                environment=self.environment,
+                host_config=self.cli.create_host_config(
+                    binds=self.volumes,
+                    network_mode=self.network_mode,
+                    shm_size=self.shm_size),
+                image=image,
+                mem_limit=self.mem_limit,
+                user=self.user,
+                working_dir=self.working_dir
             )
             self.cli.start(self.container['Id'])
 

@@ -31,7 +31,7 @@ metadata:
 spec:
   containers:
     - name: base
-      image: airflow-slave:latest
+      image: airflow-worker:latest
       command: ["/usr/local/airflow/entrypoint.sh", "/bin/bash sleep 25"]
   restartPolicy: Never
     """
@@ -57,4 +57,6 @@ spec:
         self.extract_service_account_name(pod, req)
         self.extract_init_containers(pod, req)
         self.extract_image_pull_secrets(pod, req)
+        self.extract_annotations(pod, req)
+        self.extract_affinity(pod, req)
         return req

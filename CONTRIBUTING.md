@@ -6,7 +6,7 @@ little bit helps, and credit will always be given.
 
 # Table of Contents
   * [TOC](#table-of-contents)
-  * [Types of Contributions](#types-of-contribution)
+  * [Types of Contributions](#types-of-contributions)
       - [Report Bugs](#report-bugs)
       - [Fix Bugs](#fix-bugs)
       - [Implement Features](#implement-features)
@@ -15,7 +15,7 @@ little bit helps, and credit will always be given.
   * [Documentation](#documentation)
   * [Development and Testing](#development-and-testing)
       - [Setting up a development environment](#setting-up-a-development-environment)
-      - [Pull requests guidelines](#pull-requests-guidelines)
+      - [Pull requests guidelines](#pull-request-guidelines)
       - [Testing Locally](#testing-locally)
   * [Changing the Metadata Database](#changing-the-metadata-database)
 
@@ -29,7 +29,6 @@ Report bugs through [Apache Jira](https://issues.apache.org/jira/browse/AIRFLOW)
 Please report relevant information and preferably code that exhibits
 the problem.
 
-
 ### Fix Bugs
 
 Look through the Jira issues for bugs. Anything is open to whoever wants
@@ -37,12 +36,11 @@ to implement it.
 
 ### Implement Features
 
-Look through the GitHub issues for features. Anything tagged with
-"feature" is open to whoever wants to implement it.
+Look through the [Apache Jira](https://issues.apache.org/jira/browse/AIRFLOW) for features. Any unassigned "Improvement" issue is open to whoever wants to implement it.
 
 We've created the operators, hooks, macros and executors we needed, but we
 made sure that this part of Airflow is extensible. New operators,
-hooks and operators are very welcomed!
+hooks, macros and executors are very welcomed!
 
 ### Improve Documentation
 
@@ -53,7 +51,7 @@ articles.
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue on Github.
+The best way to send feedback is to open an issue on [Apache Jira](https://issues.apache.org/jira/browse/AIRFLOW)
 
 If you are proposing a feature:
 
@@ -65,11 +63,19 @@ If you are proposing a feature:
 
 ## Documentation
 
-The latest API documentation is usually available [here](http://pythonhosted.org/airflow).
-To generate a local version, you need to have installed airflow with
-the `doc` extra. In that case you can generate the doc by running:
+The latest API documentation is usually available
+[here](https://airflow.incubator.apache.org/). To generate a local version,
+you need to have set up an Airflow development environemnt (see below). Also
+install the `doc` extra.
+
+    pip install -e .[doc]
+
+Generate the documentation by running:
 
     cd docs && ./build.sh
+
+Only a subset of the API reference documentation builds. Install additional
+extras to build the full API reference.
 
 ## Development and Testing
 

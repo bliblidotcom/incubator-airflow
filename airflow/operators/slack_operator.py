@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
 import json
 
@@ -82,15 +87,17 @@ class SlackAPIPostOperator(SlackAPIOperator):
     """
     Posts messages to a slack channel
 
-    :param channel: channel in which to post message on slack name (#general) or ID (C12318391)
+    :param channel: channel in which to post message on slack name (#general) or
+        ID (C12318391). (templated)
     :type channel: string
-    :param username: Username that airflow will be posting to Slack as
+    :param username: Username that airflow will be posting to Slack as. (templated)
     :type username: string
-    :param text: message to send to slack
+    :param text: message to send to slack. (templated)
     :type text: string
     :param icon_url: url to icon used for this message
     :type icon_url: string
-    :param attachments: extra formatting details - see https://api.slack.com/docs/attachments
+    :param attachments: extra formatting details. (templated)
+        - see https://api.slack.com/docs/attachments.
     :type attachments: array of hashes
     """
 
